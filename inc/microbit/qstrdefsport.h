@@ -473,3 +473,7 @@ Q(group)
 Q(RATE_250KBIT)
 Q(RATE_1MBIT)
 Q(RATE_2MBIT)
+
+Q(bitbot)
+Q(BitBot)
+Q(test)
