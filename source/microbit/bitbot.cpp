@@ -1,5 +1,3 @@
-//#include "libbitbot.h"
-
 #include "lib/motor.h"
 
 extern "C" {
@@ -13,6 +11,8 @@ Motor motor;
 MicroBitPin buzzer_pin(MICROBIT_ID_IO_P14, MICROBIT_PIN_P14, pc_digital_out);
 // light sensor selector (0 - left, 1 - right)
 MicroBitPin light_sensor_control(MICROBIT_ID_IO_P16, MICROBIT_PIN_P16, pc_digital_out);
+MicroBitPin line_sensor_left(MICROBIT_ID_IO_P11, MICROBIT_PIN_P11, pc_digital_in);
+MicroBitPin line_sensor_right(MICROBIT_ID_IO_P5, MICROBIT_PIN_P5, pc_digital_in);
 
 float get_light(int select)
 {
@@ -132,6 +132,18 @@ STATIC mp_obj_t bitbot_get_light(mp_obj_t self_in)
 }
 MP_DEFINE_CONST_FUN_OBJ_1(bitbot_get_light_obj, bitbot_get_light);
 
+STATIC mp_obj_t bitbot_is_line_left(mp_obj_t self_in)
+{
+  return mp_obj_new_bool(line_sensor_left.getDigitalValue());
+}
+MP_DEFINE_CONST_FUN_OBJ_1(bitbot_is_line_left_obj, bitbot_is_line_left);
+
+STATIC mp_obj_t bitbot_is_line_right(mp_obj_t self_in)
+{
+  return mp_obj_new_bool(line_sensor_right.getDigitalValue());
+}
+MP_DEFINE_CONST_FUN_OBJ_1(bitbot_is_line_right_obj, bitbot_is_line_right);
+
 STATIC mp_obj_t bitbot_set_speed(mp_uint_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args)
 {
   static const mp_arg_t allowed_args[] = {
@@ -185,6 +197,8 @@ STATIC const mp_map_elem_t bitbot_locals_dict_table[] = {
   { MP_OBJ_NEW_QSTR(MP_QSTR_buzz), (mp_obj_t)&bitbot_buzz_obj },
   { MP_OBJ_NEW_QSTR(MP_QSTR_get_light), (mp_obj_t)&bitbot_get_light_obj },
   { MP_OBJ_NEW_QSTR(MP_QSTR_set_speed), (mp_obj_t)&bitbot_set_speed_obj },
+  { MP_OBJ_NEW_QSTR(MP_QSTR_is_line_left), (mp_obj_t)&bitbot_is_line_left_obj },
+  { MP_OBJ_NEW_QSTR(MP_QSTR_is_line_right), (mp_obj_t)&bitbot_is_line_right_obj },
 };
 
 STATIC MP_DEFINE_CONST_DICT(bitbot_locals_dict, bitbot_locals_dict_table);
