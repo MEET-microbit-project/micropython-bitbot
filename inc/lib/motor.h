@@ -2,10 +2,49 @@
 #define BITBOT_MOTOR
 
 
-#include "pins.h"
+#include "MicroBitPin.h"
+
+extern "C" {
+  #include "microbitpin.h"
+}
 
 #define FORWARDS 0
 #define BACKWARDS 1
+
+// for some reason PIN_CAPABILITY_DIGITAL_IN etc. are not included properly
+const PinCapability pc_digital_in = (PinCapability) 0x01;
+const PinCapability pc_digital_out = (PinCapability)MODE_WRITE_DIGITAL; //(PinCapability) 0x02;
+const PinCapability pc_analog_in = (PinCapability) 0x04;
+const PinCapability pc_analog_out = (PinCapability) MODE_WRITE_ANALOG; //(PinCapability) 0x08;
+
+/**
+  @brief Get the event-handling id given a pin name
+  @param[in] pin name (e.g. MICROBIT_PIN_P6)
+  @return pin IO ID (e.g. MICROBIT_ID_IO_P6)
+  @rtval 0 Pin was not found (no events)
+*/
+inline int getIoId(PinName pin)
+{
+  return pin==MICROBIT_PIN_P0 ? MICROBIT_ID_IO_P0:
+         pin==MICROBIT_PIN_P1 ? MICROBIT_ID_IO_P1:
+         pin==MICROBIT_PIN_P2 ? MICROBIT_ID_IO_P2:
+         pin==MICROBIT_PIN_P3 ? MICROBIT_ID_IO_P3:
+         pin==MICROBIT_PIN_P4 ? MICROBIT_ID_IO_P4:
+         pin==MICROBIT_PIN_P5 ? MICROBIT_ID_IO_P5:
+         pin==MICROBIT_PIN_P6 ? MICROBIT_ID_IO_P6:
+         pin==MICROBIT_PIN_P7 ? MICROBIT_ID_IO_P7:
+         pin==MICROBIT_PIN_P8 ? MICROBIT_ID_IO_P8:
+         pin==MICROBIT_PIN_P9 ? MICROBIT_ID_IO_P9:
+         pin==MICROBIT_PIN_P10 ? MICROBIT_ID_IO_P10:
+         pin==MICROBIT_PIN_P11 ? MICROBIT_ID_IO_P11:
+         pin==MICROBIT_PIN_P12 ? MICROBIT_ID_IO_P12:
+         pin==MICROBIT_PIN_P13 ? MICROBIT_ID_IO_P13:
+         pin==MICROBIT_PIN_P14 ? MICROBIT_ID_IO_P14:
+         pin==MICROBIT_PIN_P15 ? MICROBIT_ID_IO_P15:
+         pin==MICROBIT_PIN_P16 ? MICROBIT_ID_IO_P16:
+         pin==MICROBIT_PIN_P19 ? MICROBIT_ID_IO_P19:
+         pin==MICROBIT_PIN_P20 ? MICROBIT_ID_IO_P20: 0;
+}
 
 /**
   Class for controlling the motor(s) (i.e. the movement) of the bitbot
@@ -44,8 +83,8 @@ public:
   higher values mean faster
   */
   void setRight(int dir, int speed);
-  /**
 
+  /**
     @brief Set direction and speed of the left motor
     @param[in] direction
     @param[in] speed of the moter in percent (0.0-100.0)
@@ -53,11 +92,24 @@ public:
   void setLeftPercent(int dir, float speed);
 
   /**
+    @brief Set speed of left motor, infer direction from sign
+    @param[in] speed (-100.0 - 100.0)
+  */
+  void setLeftPercent(float speed);
+
+  /**
     @brief Set direction and speed of the right motor
     @param[in] direction
     @param[in] speed of the moter in percent (0.0-100.0)
   */
   void setRightPercent(int dir, float speed);
+
+  /**
+    @brief Set speed of right motor, infer direction from sign
+    @param[in] speed (-100.0 - 100.0)
+  */
+  void setRightPercent(float speed);
+
 
   /**
     @brief Stop moving
