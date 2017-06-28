@@ -231,4 +231,7 @@ extern const mp_obj_module_t love_module;
 extern const mp_obj_module_t antigravity_module;
 extern const mp_obj_module_t this_module;
 
+// added declarations
+mp_obj_t microbit_sleep(mp_obj_t ms_in);
+
 #endif // __MICROPY_INCLUDED_MICROBIT_MODMICROBIT_H__

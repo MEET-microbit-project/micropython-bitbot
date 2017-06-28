@@ -43,7 +43,7 @@ STATIC mp_obj_t microbit_reset_(void) {
 }
 MP_DEFINE_CONST_FUN_OBJ_0(microbit_reset_obj, microbit_reset_);
 
-STATIC mp_obj_t microbit_sleep(mp_obj_t ms_in) {
+mp_obj_t microbit_sleep(mp_obj_t ms_in) {
     mp_int_t ms;
     if (mp_obj_is_integer(ms_in)) {
         ms = mp_obj_get_int(ms_in);
@@ -125,7 +125,7 @@ STATIC const mp_map_elem_t microbit_module_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR_running_time), (mp_obj_t)&microbit_running_time_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_panic), (mp_obj_t)&microbit_panic_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_temperature), (mp_obj_t)&microbit_temperature_obj },
-    
+
     { MP_OBJ_NEW_QSTR(MP_QSTR_pin0), (mp_obj_t)&microbit_p0_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_pin1), (mp_obj_t)&microbit_p1_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_pin2), (mp_obj_t)&microbit_p2_obj },

@@ -1,16 +1,16 @@
-//#include "libbitbot.h"
-
+#include "microbitobj.h"
 #include "MicroBit.h"
-
 
 extern "C" {
 
-#include "gpio_api.h"
-#include "py/runtime0.h"
 #include "py/runtime.h"
-#include "py/nlr.h"
-#include "microbitobj.h"
+#include "py/nlr.h" // raise exceptions
+#include "py/mphal.h"
 #include "lib/neopixel.h"
+#include "lib/pwm.h"
+#include "microbit/modmicrobit.h"
+#include "microbit/microbitpin.h"
+
 
 extern const mp_obj_type_t bitbot_type;
 
@@ -18,6 +18,9 @@ typedef struct _bitbot_obj_t {
   mp_obj_base_t base;
 
   neopixel_strip_t neopixel_strip;
+  struct {
+    microbit_pin_obj_t buzzer;
+  } pins;
 } bitbot_obj_t;
 
 STATIC mp_obj_t bitbot_make_new(const mp_obj_type_t *type_in, mp_uint_t n_args, mp_uint_t n_kw, const mp_obj_t *args) {
@@ -27,7 +30,10 @@ STATIC mp_obj_t bitbot_make_new(const mp_obj_type_t *type_in, mp_uint_t n_args, 
   self->base.type = &bitbot_type;
 
   // init neopixel
-  neopixel_init(&self->neopixel_strip, MICROBIT_PIN_P13, 12);
+  neopixel_init(&self->neopixel_strip, microbit_p13_obj.name, 12);
+
+  // set pins
+  self->pins.buzzer = microbit_p14_obj;
 
   return self;
 }
@@ -76,12 +82,22 @@ STATIC mp_obj_t bitbot_show(mp_obj_t self_in) {
 }
 MP_DEFINE_CONST_FUN_OBJ_1(bitbot_show_obj, bitbot_show);
 
+STATIC mp_obj_t bitbot_buzz(mp_obj_t self_in, mp_obj_t ms_in) {
+  bitbot_obj_t *self = (bitbot_obj_t*)self_in;
+
+  microbit_pin_write_digital(&self->pins.buzzer, mp_obj_new_int(1));
+  microbit_sleep(ms_in);
+  microbit_pin_write_digital(&self->pins.buzzer, mp_obj_new_int(0));
+  return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_2(bitbot_buzz_obj, bitbot_buzz);
+
 STATIC const mp_map_elem_t bitbot_locals_dict_table[] = {
   { MP_OBJ_NEW_QSTR(MP_QSTR_set_rgb), (mp_obj_t)&bitbot_set_rgb_obj },
   { MP_OBJ_NEW_QSTR(MP_QSTR_get_rgb), (mp_obj_t)&bitbot_get_rgb_obj },
   { MP_OBJ_NEW_QSTR(MP_QSTR_clear), (mp_obj_t)&bitbot_clear_obj },
   { MP_OBJ_NEW_QSTR(MP_QSTR_show), (mp_obj_t)&bitbot_show_obj },
-  // { MP_OBJ_NEW_QSTR(MP_QSTR_test), (mp_obj_t)&bitbot_test_obj },
+  { MP_OBJ_NEW_QSTR(MP_QSTR_buzz), (mp_obj_t)&bitbot_buzz_obj },
 };
 
 STATIC MP_DEFINE_CONST_DICT(bitbot_locals_dict, bitbot_locals_dict_table);
