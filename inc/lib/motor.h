@@ -14,7 +14,6 @@ extern "C" {
 // for some reason PIN_CAPABILITY_DIGITAL_IN etc. are not included properly
 const PinCapability pc_digital_in = (PinCapability) 0x01;
 const PinCapability pc_digital_out = (PinCapability)MODE_WRITE_DIGITAL; //(PinCapability) 0x02;
-const PinCapability pc_analog_in = (PinCapability) 0x04;
 const PinCapability pc_analog_out = (PinCapability) MODE_WRITE_ANALOG; //(PinCapability) 0x08;
 
 /**

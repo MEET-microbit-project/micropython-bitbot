@@ -4,18 +4,27 @@
 
 extern "C" {
   #include "py/mphal.h"
+  // light sensor (from microbitpin.cpp)
+  extern const microbit_pin_obj_t microbit_p2_obj;
 }
 
 Motor motor;
 
 MicroBitPin buzzer_pin(MICROBIT_ID_IO_P14, MICROBIT_PIN_P14, pc_digital_out);
+// light sensor selector (0 - left, 1 - right)
+MicroBitPin light_sensor_control(MICROBIT_ID_IO_P16, MICROBIT_PIN_P16, pc_digital_out);
 
-// void buzz(int ms)
-// {
-//   buzzer_pin.setDigitalValue(1);
-//   mp_hal_delay_ms(ms);
-//   buzzer_pin.setDigitalValue(0);
-// }
+float get_light(int select)
+{
+  light_sensor_control.setDigitalValue(select);
+
+  microbit_obj_pin_acquire(&microbit_p2_obj, microbit_pin_mode_unused);
+  analogin_t obj;
+  analogin_init(&obj, (PinName)microbit_p2_obj.name);
+  int val = analogin_read_u16(&obj);
+  NRF_ADC->ENABLE = ADC_ENABLE_ENABLE_Disabled;
+  return (float)val / MICROBIT_PIN_MAX_OUTPUT * 100.0;
+}
 
 extern "C" {
 
@@ -116,6 +125,13 @@ STATIC mp_obj_t bitbot_buzz(mp_obj_t self_in, mp_obj_t ms_in)
 }
 MP_DEFINE_CONST_FUN_OBJ_2(bitbot_buzz_obj, bitbot_buzz);
 
+STATIC mp_obj_t bitbot_get_light(mp_obj_t self_in)
+{
+  mp_obj_t light[2] = {mp_obj_new_float(get_light(0)), mp_obj_new_float(get_light(1))};
+  return mp_obj_new_tuple(2, light);
+}
+MP_DEFINE_CONST_FUN_OBJ_1(bitbot_get_light_obj, bitbot_get_light);
+
 STATIC mp_obj_t bitbot_set_speed(mp_uint_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args)
 {
   static const mp_arg_t allowed_args[] = {
@@ -167,6 +183,7 @@ STATIC const mp_map_elem_t bitbot_locals_dict_table[] = {
   { MP_OBJ_NEW_QSTR(MP_QSTR_clear), (mp_obj_t)&bitbot_clear_obj },
   { MP_OBJ_NEW_QSTR(MP_QSTR_show), (mp_obj_t)&bitbot_show_obj },
   { MP_OBJ_NEW_QSTR(MP_QSTR_buzz), (mp_obj_t)&bitbot_buzz_obj },
+  { MP_OBJ_NEW_QSTR(MP_QSTR_get_light), (mp_obj_t)&bitbot_get_light_obj },
   { MP_OBJ_NEW_QSTR(MP_QSTR_set_speed), (mp_obj_t)&bitbot_set_speed_obj },
 };
 
