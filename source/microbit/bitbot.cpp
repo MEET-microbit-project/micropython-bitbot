@@ -2,7 +2,20 @@
 
 #include "lib/motor.h"
 
+extern "C" {
+  #include "py/mphal.h"
+}
+
 Motor motor;
+
+MicroBitPin buzzer_pin(MICROBIT_ID_IO_P14, MICROBIT_PIN_P14, pc_digital_out);
+
+// void buzz(int ms)
+// {
+//   buzzer_pin.setDigitalValue(1);
+//   mp_hal_delay_ms(ms);
+//   buzzer_pin.setDigitalValue(0);
+// }
 
 extern "C" {
 
@@ -21,7 +34,8 @@ typedef struct _bitbot_obj_t {
   neopixel_strip_t neopixel_strip;
 } bitbot_obj_t;
 
-STATIC mp_obj_t bitbot_make_new(const mp_obj_type_t *type_in, mp_uint_t n_args, mp_uint_t n_kw, const mp_obj_t *args) {
+STATIC mp_obj_t bitbot_make_new(const mp_obj_type_t *type_in, mp_uint_t n_args, mp_uint_t n_kw, const mp_obj_t *args)
+{
   (void)type_in;
 
   bitbot_obj_t *self = m_new_obj(bitbot_obj_t);
@@ -63,19 +77,44 @@ STATIC mp_obj_t bitbot_get_rgb(mp_obj_t self_in, mp_obj_t index_in)
 }
 MP_DEFINE_CONST_FUN_OBJ_2(bitbot_get_rgb_obj, bitbot_get_rgb);
 
-STATIC mp_obj_t bitbot_clear(mp_obj_t self_in) {
+STATIC mp_obj_t bitbot_clear(mp_obj_t self_in)
+{
   bitbot_obj_t *self = (bitbot_obj_t*)self_in;
   neopixel_clear(&self->neopixel_strip);
+  buzzer_pin.setDigitalValue(1);
+  mp_hal_delay_ms(100);
+  buzzer_pin.setDigitalValue(0);
   return mp_const_none;
 }
 MP_DEFINE_CONST_FUN_OBJ_1(bitbot_clear_obj, bitbot_clear);
 
-STATIC mp_obj_t bitbot_show(mp_obj_t self_in) {
+STATIC mp_obj_t bitbot_show(mp_obj_t self_in)
+{
   bitbot_obj_t *self = (bitbot_obj_t*)self_in;
   neopixel_show(&self->neopixel_strip);
   return mp_const_none;
 }
 MP_DEFINE_CONST_FUN_OBJ_1(bitbot_show_obj, bitbot_show);
+
+STATIC mp_obj_t bitbot_buzz(mp_obj_t self_in, mp_obj_t ms_in)
+{
+  mp_int_t ms;
+  if (mp_obj_is_integer(ms_in)) {
+      ms = mp_obj_get_int(ms_in);
+  } else {
+      ms = (mp_int_t)mp_obj_get_float(ms_in);
+  }
+  buzzer_pin.setDigitalValue(1);
+  if (ms > 0) {
+      mp_hal_delay_ms(ms);
+  }
+  buzzer_pin.setDigitalValue(0);
+  if (ms < 0) {
+    nlr_raise(mp_obj_new_exception_msg(&mp_type_ValueError, "time must be positive"));
+  }
+  return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_2(bitbot_buzz_obj, bitbot_buzz);
 
 STATIC mp_obj_t bitbot_set_speed(mp_uint_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args)
 {
@@ -127,6 +166,7 @@ STATIC const mp_map_elem_t bitbot_locals_dict_table[] = {
   { MP_OBJ_NEW_QSTR(MP_QSTR_get_rgb), (mp_obj_t)&bitbot_get_rgb_obj },
   { MP_OBJ_NEW_QSTR(MP_QSTR_clear), (mp_obj_t)&bitbot_clear_obj },
   { MP_OBJ_NEW_QSTR(MP_QSTR_show), (mp_obj_t)&bitbot_show_obj },
+  { MP_OBJ_NEW_QSTR(MP_QSTR_buzz), (mp_obj_t)&bitbot_buzz_obj },
   { MP_OBJ_NEW_QSTR(MP_QSTR_set_speed), (mp_obj_t)&bitbot_set_speed_obj },
 };
 
