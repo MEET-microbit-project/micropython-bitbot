@@ -1,3 +1,57 @@
+Bit:Bot module
+==============
+
+This is the MicroPython source code for the BBC micro:bit, modified to
+include a module for controlling the [Bit:Bot](4tronix.co.uk/bitbot).
+For instructions on how to build, see further down.
+
+The following is an overview of the module.
+
+```python
+import bitbot
+
+bb = bitbot.BitBot()
+```
+
+Motor controls
+--------------
+
+```python
+# set the speed of the motor in percent
+# for each side separately (left_speed, right_speed):
+bb.set_speed(100, 50)  # make a right curve
+# or for both sides at once (moving straight).
+# negative values mean driving backwards
+bb.set_speed(-30.5)
+# alternatively it is possible to set only one side:
+bb.set_speed(left=40)
+```
+
+Sensor input
+------------
+```python
+# get readings from the light sensors
+# returns a tuple of percentages - higher is brighter
+light_left, light_right = bb.get_light()  # returns e.g. (70.3, 71.0)
+
+# get input from the line sensors
+bb.is_line_left()  # returns True / False
+bb.is_line_right()
+```
+
+Output
+------
+```python
+# control the 12 neopixel (index 0 - 11)
+bb.set_rgb(3, 255, 0, 0)  # (index, red, green, blue)
+bb.set_rgb(0, 10, 0, 10)
+bb.show() # show changes
+
+# make a buzzing sound for an indicated number of milliseconds
+bb.buzz(100)
+```
+
+
 MicroPython for the BBC micro:bit
 =================================
 
