@@ -1,14 +1,12 @@
-from bitbot import *
 from microbit import *
-
-bb = BitBot()
-
-bb.set_rgb(10, 50, 0, 0)
-bb.show()
+import bitbot
 
 display.scroll("H")
 
-bb.buzz(100)
+bitbot.buzz(100)
+
+bitbot.neopixel[5] = (10, 0, 0)
+bitbot.neopixel.show()
 
 while(True):
     sleep(100)
