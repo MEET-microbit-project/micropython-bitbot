@@ -92,5 +92,8 @@ void pinmode_error(const microbit_pin_obj_t *pin);
 
 // added declarations
 mp_obj_t microbit_pin_write_digital(mp_obj_t self_in, mp_obj_t value_in);
+mp_obj_t microbit_pin_read_digital(mp_obj_t self_in);
+mp_obj_t microbit_pin_write_analog(mp_obj_t self_in, mp_obj_t value_in);
+mp_obj_t microbit_pin_read_analog(mp_obj_t self_in);
 
 #endif // __MICROPY_INCLUDED_MICROBIT_MICROBITPIN_H__

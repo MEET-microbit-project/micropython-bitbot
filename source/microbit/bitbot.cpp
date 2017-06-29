@@ -5,6 +5,8 @@
 // set pins
 #define PIN_BUZZER            ((microbit_pin_obj_t*)&microbit_p14_obj)
 #define PIN_LINE_LEFT         ((microbit_pin_obj_t*)&microbit_p11_obj)
+#define PIN_LIGHT             ((microbit_pin_obj_t*)&microbit_p2_obj)
+#define PIN_LIGHT_CONTROL     ((microbit_pin_obj_t*)&microbit_p16_obj)
 #define PIN_LINE_RIGHT        ((microbit_pin_obj_t*)&microbit_p5_obj)
 #define PIN_MOTOR_LEFT_DIR    ((microbit_pin_obj_t*)&microbit_p8_obj)
 #define PIN_MOTOR_RIGHT_DIR   ((microbit_pin_obj_t*)&microbit_p12_obj)
@@ -26,6 +28,9 @@ extern "C" {
 
 extern const mp_obj_type_t bitbot_type;
 
+// for convenience
+const mp_obj_t mp_const_int_zero = mp_obj_new_int(0);
+const mp_obj_t mp_const_int_one = mp_obj_new_int(1);
 
 // define a constant neopixel object
 color_t *bitbot_neopixel_init() {
@@ -41,7 +46,7 @@ color_t *bitbot_neopixel_init() {
   return leds;
 }
 
-const neopixel_obj_t bitbot_neopixel = {
+const neopixel_obj_t bitbot_neopixel_obj = {
   &neopixel_type,
   {
     NAME_PIN_NEOPIXEL,
@@ -51,18 +56,31 @@ const neopixel_obj_t bitbot_neopixel = {
 };
 
 STATIC mp_obj_t bitbot_buzz(mp_obj_t ms_in) {
-  microbit_pin_write_digital(PIN_BUZZER, mp_obj_new_int(1));
+  microbit_pin_write_digital(PIN_BUZZER, mp_const_int_one);
   microbit_sleep(ms_in);
-  microbit_pin_write_digital(PIN_BUZZER, mp_obj_new_int(0));
+  microbit_pin_write_digital(PIN_BUZZER, mp_const_int_zero);
   return mp_const_none;
 }
 MP_DEFINE_CONST_FUN_OBJ_1(bitbot_buzz_obj, bitbot_buzz);
+
+STATIC mp_obj_t bitbot_get_brightness()
+{
+  mp_obj_t light[2];
+  microbit_pin_write_digital(PIN_LIGHT_CONTROL, mp_const_int_zero);
+  light[0] = mp_obj_new_float(mp_obj_get_float(microbit_pin_read_analog(PIN_LIGHT)) / 10.23);
+  microbit_pin_write_digital(PIN_LIGHT_CONTROL, mp_const_int_one);
+  light[1] = mp_obj_new_float(mp_obj_get_float(microbit_pin_read_analog(PIN_LIGHT)) / 10.23);
+  return mp_obj_new_tuple(2, light);
+}
+MP_DEFINE_CONST_FUN_OBJ_0(bitbot_get_brightness_obj, bitbot_get_brightness);
+
 
 
 STATIC const mp_map_elem_t bitbot_module_globals_table[] = {
   { MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_OBJ_NEW_QSTR(MP_QSTR_bitbot) },
   { MP_OBJ_NEW_QSTR(MP_QSTR_buzz), (mp_obj_t)&bitbot_buzz_obj },
-  { MP_OBJ_NEW_QSTR(MP_QSTR_neopixel), (mp_obj_t)&bitbot_neopixel },
+  { MP_OBJ_NEW_QSTR(MP_QSTR_neopixel), (mp_obj_t)&bitbot_neopixel_obj },
+  { MP_OBJ_NEW_QSTR(MP_QSTR_get_brightness), (mp_obj_t)&bitbot_get_brightness_obj },
 };
 
 STATIC MP_DEFINE_CONST_DICT(bitbot_module_globals, bitbot_module_globals_table);
