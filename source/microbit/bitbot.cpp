@@ -47,8 +47,8 @@ STATIC mp_obj_t bitbot_set_speed(mp_obj_t left, mp_obj_t right)
   speed = mp_obj_get_float(left);
   microbit_pin_write_digital(PIN_MOTOR_LEFT_DIR, mp_obj_new_int(speed<0?1:0));
   microbit_pin_write_analog(PIN_MOTOR_LEFT_SPEED, mp_obj_new_int((int)(10.23 * (speed + ((speed<0)?100:0)))));
-  microbit_pin_write_digital(PIN_MOTOR_RIGHT_DIR, mp_obj_new_int(speed<0?1:0));
   speed = mp_obj_get_float(right);
+  microbit_pin_write_digital(PIN_MOTOR_RIGHT_DIR, mp_obj_new_int(speed<0?1:0));
   microbit_pin_write_analog(PIN_MOTOR_RIGHT_SPEED, mp_obj_new_int((int)(10.23 * (speed + ((speed<0)?100:0)))));
   return mp_const_none;
 }
